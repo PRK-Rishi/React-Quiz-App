@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import Quiz from './Quiz';
-import Result from './Result';
+import Quiz from './components/Quiz';
+import Result from './components/Result';
+import Login from './components/Login';
+import Register from './components/Register';
 
 const App = () => {
-  const [username, setUsername] = useState('');
+  const [user, setUser] = useState(null);
   const [quizStarted, setQuizStarted] = useState(false);
   const [results, setResults] = useState(null);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const startQuiz = () => {
-    if (username.trim() === '') {
-      alert('Please enter your name to start the quiz.');
-      return;
-    }
     setQuizStarted(true);
   };
 
@@ -21,30 +20,33 @@ const App = () => {
   };
 
   const restartQuiz = () => {
-    setUsername('');
     setQuizStarted(false);
     setResults(null);
   };
 
   return (
     <div>
-      {!quizStarted && !results && (
-        <div className="homepage">
-          <div className="welcome-message">
-            <h1>Welcome to the AI, ML, and Computer Science Quiz!</h1>
-            <p>Please enter your name to begin the quiz:</p>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your Name"
-            />
-            <button onClick={startQuiz}>Start Quiz</button>
-          </div>
-        </div>
+      {!user ? (
+        isRegistering ? (
+          <Register setIsRegistering={setIsRegistering} />
+        ) : (
+          <Login setUser={setUser} setIsRegistering={setIsRegistering} />
+        )
+      ) : (
+        <>
+          {!quizStarted && !results && (
+            <div className="homepage">
+              <div className="welcome-message">
+                <h1>Welcome to the AI, ML, and Computer Science Quiz!</h1>
+                <p>Welcome, {user.username}!</p>
+                <button onClick={startQuiz}>Start Quiz</button>
+              </div>
+            </div>
+          )}
+          {quizStarted && <Quiz username={user.username} endQuiz={endQuiz} />}
+          {results && <Result results={results} restartQuiz={restartQuiz} />}
+        </>
       )}
-      {quizStarted && <Quiz username={username} endQuiz={endQuiz} />}
-      {results && <Result results={results} restartQuiz={restartQuiz} />}
     </div>
   );
 };
